@@ -1,0 +1,1079 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Management System</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background: #f4f6f8;
+            color: #222;
+        }
+
+        header {
+            background: #263238;
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin-bottom: 5px;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 25px auto;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .stat {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .stat h2 {
+            font-size: 28px;
+            margin-top: 8px;
+        }
+
+        .section {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .section h2 {
+            margin-bottom: 15px;
+        }
+
+        .form {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        input {
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+        }
+
+        button {
+            padding: 11px 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background: #1976d2;
+            color: white;
+            font-weight: bold;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        .danger {
+            background: #d32f2f;
+        }
+
+        .success {
+            background: #388e3c;
+        }
+
+        .warning {
+            background: #f57c00;
+        }
+
+        .search {
+            margin-bottom: 15px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background: #eceff1;
+        }
+
+        .available {
+            color: #2e7d32;
+            font-weight: bold;
+        }
+
+        .issued {
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .queue-box {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
+        .history {
+            max-height: 250px;
+            overflow-y: auto;
+            margin-top: 15px;
+        }
+
+        .history-item {
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .empty {
+            color: #777;
+            text-align: center;
+            padding: 20px;
+        }
+
+        @media (max-width: 800px) {
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .form {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Library Management System</h1>
+    <p>Array, Queue and Stack Implementation</p>
+</header>
+
+<div class="container">
+
+    <div class="stats">
+
+        <div class="stat">
+            <p>Total Books</p>
+            <h2 id="totalBooks">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Available</p>
+            <h2 id="availableBooks">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>Issued</p>
+            <h2 id="issuedBooks">0</h2>
+        </div>
+
+        <div class="stat">
+            <p>History</p>
+            <h2 id="historyCount">0</h2>
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Add Book</h2>
+
+        <div class="form">
+
+            <input
+                type="text"
+                id="bookTitle"
+                placeholder="Book title"
+            >
+
+            <input
+                type="text"
+                id="bookAuthor"
+                placeholder="Author"
+            >
+
+            <input
+                type="text"
+                id="bookId"
+                placeholder="Book ID"
+            >
+
+            <button onclick="addBook()" class="success">
+                Add Book
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Issue / Return Book</h2>
+
+        <div class="form">
+
+            <input
+                type="text"
+                id="userName"
+                placeholder="Student name"
+            >
+
+            <input
+                type="text"
+                id="actionBookId"
+                placeholder="Book ID"
+            >
+
+            <button onclick="issueBook()">
+                Issue Book
+            </button>
+
+            <button onclick="returnBook()" class="success">
+                Return Book
+            </button>
+
+        </div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Search Books</h2>
+
+        <input
+            class="search"
+            type="text"
+            id="search"
+            placeholder="Search by title, author or ID..."
+            oninput="displayBooks()"
+        >
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Status</th>
+                    <th>Queue</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="bookTable"></tbody>
+
+        </table>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Waiting Queues</h2>
+
+        <div id="queues"></div>
+
+    </div>
+
+
+    <div class="section">
+
+        <h2>Borrowing History</h2>
+
+        <button onclick="undoLastAction()" class="warning">
+            Undo Last Action
+        </button>
+
+        <div id="history" class="history"></div>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    /*
+        ARRAY
+
+        Stores all books in the library.
+    */
+
+    let books = [
+
+        {
+            id: "B101",
+            title: "Data Structures",
+            author: "Mark Allen",
+            available: true,
+            queue: []
+        },
+
+        {
+            id: "B102",
+            title: "Algorithms",
+            author: "Thomas Cormen",
+            available: true,
+            queue: []
+        },
+
+        {
+            id: "B103",
+            title: "Operating Systems",
+            author: "Galvin",
+            available: true,
+            queue: []
+        },
+
+        {
+            id: "B104",
+            title: "Computer Networks",
+            author: "Andrew Tanenbaum",
+            available: true,
+            queue: []
+        }
+
+    ];
+
+
+    /*
+        STACK
+
+        Stores all issue/return operations.
+
+        push() -> add operation
+        pop()  -> remove latest operation
+    */
+
+    let historyStack = [];
+
+
+    /*
+        ADD BOOK
+    */
+
+    function addBook() {
+
+        const title =
+            document.getElementById("bookTitle").value.trim();
+
+        const author =
+            document.getElementById("bookAuthor").value.trim();
+
+        const id =
+            document.getElementById("bookId").value.trim();
+
+
+        if (!title || !author || !id) {
+
+            alert("Please fill all fields.");
+
+            return;
+        }
+
+
+        const exists =
+            books.some(book => book.id === id);
+
+
+        if (exists) {
+
+            alert("Book ID already exists.");
+
+            return;
+        }
+
+
+        const newBook = {
+
+            id: id,
+
+            title: title,
+
+            author: author,
+
+            available: true,
+
+            queue: []
+
+        };
+
+
+        // ARRAY: add new book
+        books.push(newBook);
+
+
+        document.getElementById("bookTitle").value = "";
+        document.getElementById("bookAuthor").value = "";
+        document.getElementById("bookId").value = "";
+
+
+        displayBooks();
+        updateStats();
+    }
+
+
+    /*
+        FIND BOOK
+    */
+
+    function findBook(id) {
+
+        return books.find(book => book.id === id);
+
+    }
+
+
+    /*
+        ISSUE BOOK
+    */
+
+    function issueBook() {
+
+        const user =
+            document.getElementById("userName").value.trim();
+
+        const id =
+            document.getElementById("actionBookId").value.trim();
+
+
+        if (!user || !id) {
+
+            alert("Enter student name and book ID.");
+
+            return;
+        }
+
+
+        const book = findBook(id);
+
+
+        if (!book) {
+
+            alert("Book not found.");
+
+            return;
+        }
+
+
+        /*
+            If book is already issued,
+            add the student to the queue.
+        */
+
+        if (!book.available) {
+
+            if (book.queue.includes(user)) {
+
+                alert("Student is already in the queue.");
+
+                return;
+            }
+
+
+            // QUEUE: add at the end
+            book.queue.push(user);
+
+
+            alert(
+                user +
+                " added to the waiting queue."
+            );
+
+
+            displayBooks();
+            displayQueues();
+
+            return;
+        }
+
+
+        /*
+            Book is available.
+            Issue it.
+        */
+
+        book.available = false;
+
+
+        /*
+            STACK: store operation
+        */
+
+        historyStack.push({
+
+            type: "issue",
+
+            bookId: id,
+
+            user: user
+
+        });
+
+
+        alert(
+            book.title +
+            " issued to " +
+            user
+        );
+
+
+        clearActionInputs();
+
+        displayBooks();
+        displayQueues();
+        displayHistory();
+        updateStats();
+    }
+
+
+    /*
+        RETURN BOOK
+    */
+
+    function returnBook() {
+
+        const user =
+            document.getElementById("userName").value.trim();
+
+        const id =
+            document.getElementById("actionBookId").value.trim();
+
+
+        if (!user || !id) {
+
+            alert("Enter student name and book ID.");
+
+            return;
+        }
+
+
+        const book = findBook(id);
+
+
+        if (!book) {
+
+            alert("Book not found.");
+
+            return;
+        }
+
+
+        if (book.available) {
+
+            alert("This book is not currently issued.");
+
+            return;
+        }
+
+
+        /*
+            Return book.
+        */
+
+        book.available = true;
+
+
+        /*
+            STACK
+        */
+
+        historyStack.push({
+
+            type: "return",
+
+            bookId: id,
+
+            user: user
+
+        });
+
+
+        /*
+            QUEUE
+
+            If students are waiting,
+            the first student gets the book.
+        */
+
+        if (book.queue.length > 0) {
+
+            // QUEUE: remove first student
+            const nextUser =
+                book.queue.shift();
+
+
+            book.available = false;
+
+
+            historyStack.push({
+
+                type: "issue",
+
+                bookId: id,
+
+                user: nextUser
+
+            });
+
+
+            alert(
+                book.title +
+                " automatically issued to " +
+                nextUser
+            );
+
+        }
+        else {
+
+            alert(
+                book.title +
+                " returned successfully."
+            );
+
+        }
+
+
+        clearActionInputs();
+
+        displayBooks();
+        displayQueues();
+        displayHistory();
+        updateStats();
+    }
+
+
+    /*
+        DELETE BOOK
+    */
+
+    function deleteBook(id) {
+
+        const index =
+            books.findIndex(book => book.id === id);
+
+
+        if (index === -1) {
+            return;
+        }
+
+
+        if (!books[index].available) {
+
+            alert("Cannot delete an issued book.");
+
+            return;
+        }
+
+
+        if (books[index].queue.length > 0) {
+
+            alert(
+                "Cannot delete a book with waiting students."
+            );
+
+            return;
+        }
+
+
+        /*
+            ARRAY
+
+            Remove book from array.
+        */
+
+        books.splice(index, 1);
+
+
+        displayBooks();
+        displayQueues();
+        updateStats();
+    }
+
+
+    /*
+        UNDO LAST ACTION
+
+        STACK:
+        pop() removes the most recent operation.
+    */
+
+    function undoLastAction() {
+
+        if (historyStack.length === 0) {
+
+            alert("No action to undo.");
+
+            return;
+        }
+
+
+        const action =
+            historyStack.pop();
+
+
+        const book =
+            findBook(action.bookId);
+
+
+        if (!book) {
+            return;
+        }
+
+
+        if (action.type === "issue") {
+
+            book.available = true;
+
+
+            alert(
+                "Issue of " +
+                book.title +
+                " to " +
+                action.user +
+                " undone."
+            );
+
+        }
+
+
+        else if (action.type === "return") {
+
+            book.available = false;
+
+
+            alert(
+                "Return of " +
+                book.title +
+                " by " +
+                action.user +
+                " undone."
+            );
+
+        }
+
+
+        displayBooks();
+        displayQueues();
+        displayHistory();
+        updateStats();
+    }
+
+
+    /*
+        DISPLAY BOOKS
+    */
+
+    function displayBooks() {
+
+        const table =
+            document.getElementById("bookTable");
+
+
+        const searchText =
+            document.getElementById("search")
+                .value
+                .toLowerCase();
+
+
+        const filteredBooks =
+            books.filter(book =>
+
+                book.id
+                    .toLowerCase()
+                    .includes(searchText)
+
+                ||
+
+                book.title
+                    .toLowerCase()
+                    .includes(searchText)
+
+                ||
+
+                book.author
+                    .toLowerCase()
+                    .includes(searchText)
+
+            );
+
+
+        if (filteredBooks.length === 0) {
+
+            table.innerHTML = `
+                <tr>
+                    <td colspan="6" class="empty">
+                        No books found
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        table.innerHTML =
+            filteredBooks.map(book => `
+
+                <tr>
+
+                    <td>${book.id}</td>
+
+                    <td>${book.title}</td>
+
+                    <td>${book.author}</td>
+
+                    <td class="${
+                        book.available
+                        ? "available"
+                        : "issued"
+                    }">
+
+                        ${
+                            book.available
+                            ? "Available"
+                            : "Issued"
+                        }
+
+                    </td>
+
+                    <td>
+                        ${book.queue.length}
+                    </td>
+
+                    <td>
+
+                        <button
+                            class="danger"
+                            onclick="deleteBook('${book.id}')"
+                        >
+                            Delete
+                        </button>
+
+                    </td>
+
+                </tr>
+
+            `).join("");
+    }
+
+
+    /*
+        DISPLAY QUEUES
+    */
+
+    function displayQueues() {
+
+        const container =
+            document.getElementById("queues");
+
+
+        const booksWithQueues =
+            books.filter(
+                book => book.queue.length > 0
+            );
+
+
+        if (booksWithQueues.length === 0) {
+
+            container.innerHTML =
+                `<p class="empty">
+                    No waiting queues.
+                </p>`;
+
+            return;
+        }
+
+
+        container.innerHTML =
+            booksWithQueues.map(book => `
+
+                <div class="queue-box">
+
+                    <strong>
+                        ${book.title} (${book.id})
+                    </strong>
+
+                    <p>
+                        Queue:
+                        ${book.queue.join(" → ")}
+                    </p>
+
+                </div>
+
+            `).join("");
+    }
+
+
+    /*
+        DISPLAY STACK HISTORY
+    */
+
+    function displayHistory() {
+
+        const container =
+            document.getElementById("history");
+
+
+        if (historyStack.length === 0) {
+
+            container.innerHTML =
+                `<p class="empty">
+                    No history.
+                </p>`;
+
+            return;
+        }
+
+
+        /*
+            Reverse the display so that
+            the TOP of the stack appears first.
+        */
+
+        container.innerHTML =
+            historyStack
+                .slice()
+                .reverse()
+                .map((action, index) => {
+
+                    const book =
+                        findBook(action.bookId);
+
+
+                    return `
+
+                        <div class="history-item">
+
+                            <strong>
+                                ${action.type.toUpperCase()}
+                            </strong>
+
+                            -
+                            ${
+                                book
+                                ? book.title
+                                : action.bookId
+                            }
+
+                            <br>
+
+                            User:
+                            ${action.user}
+
+                            ${
+                                index === 0
+                                ? "<strong> (TOP)</strong>"
+                                : ""
+                            }
+
+                        </div>
+
+                    `;
+
+                })
+                .join("");
+    }
+
+
+    /*
+        UPDATE STATISTICS
+    */
+
+    function updateStats() {
+
+        const total =
+            books.length;
+
+
+        const available =
+            books.filter(
+                book => book.available
+            ).length;
+
+
+        const issued =
+            books.filter(
+                book => !book.available
+            ).length;
+
+
+        document.getElementById("totalBooks")
+            .textContent = total;
+
+
+        document.getElementById("availableBooks")
+            .textContent = available;
+
+
+        document.getElementById("issuedBooks")
+            .textContent = issued;
+
+
+        document.getElementById("historyCount")
+            .textContent = historyStack.length;
+    }
+
+
+    /*
+        CLEAR INPUTS
+    */
+
+    function clearActionInputs() {
+
+        document.getElementById("userName")
+            .value = "";
+
+        document.getElementById("actionBookId")
+            .value = "";
+    }
+
+
+    /*
+        INITIALIZE
+    */
+
+    displayBooks();
+    displayQueues();
+    displayHistory();
+    updateStats();
+
+</script>
+
+</body>
+</html>
